@@ -3,7 +3,7 @@ import { useAppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import moment from "moment";
 
-const Sidebar = () => {
+const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
   const {
     theme,
     setTheme,
@@ -17,11 +17,11 @@ const Sidebar = () => {
 
   return (
     <div
-      className="flex flex-col h-screen min-w-[300px] max-w-[300px] p-6 
+      className={`flex flex-col h-screen min-w-[300px] max-w-[300px] p-6 
       bg-[#f9f9f9] dark:bg-[#121212] 
       border-r border-gray-200 dark:border-white/10 
       transition-all duration-500 ease-in-out 
-      max-md:absolute left-0 z-50"
+      max-md:absolute left-0 z-50 ${!isMenuOpen && "max-md:-translate-x-full"}`}
     >
       {/* Logo */}
       <div className="flex items-center mb-8 px-2">
@@ -33,7 +33,7 @@ const Sidebar = () => {
       </div>
 
       {/* New Chat Button */}
-      <button className="flex justify-center items-center w-full py-2 mt-10 text-white bg-gradient-to-r from-[#A456F7] to-[#cfccfffe] text-sm rounded-md cursor-pointer">
+      <button className="flex justify-center items-center w-full py-2 mt-2 text-white bg-gradient-to-r from-[#A456F7] to-[#cfccfffe] text-sm rounded-md cursor-pointer">
         <span className="mr-2 text-xl">+</span>
         New Chat
       </button>
@@ -74,7 +74,11 @@ const Sidebar = () => {
           .map((chat) => (
             <div
               key={chat._id}
-              onClick={() => setSelectedChat(chat)}
+              onClick={() => {
+                navigate("/");
+                setSelectedChat(chat);
+                setIsMenuOpen(false);
+              }}
               className="group p-2 px-4 flex justify-between items-center
               bg-white dark:bg-[#57317C]/10 
               border border-gray-300 dark:border-[#80609F]/15
@@ -91,7 +95,6 @@ const Sidebar = () => {
                 </p>
               </div>
 
-              {/* Delete Icon */}
               <img
                 src={assets.bin_icon}
                 className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-4 cursor-pointer invert"
@@ -103,7 +106,10 @@ const Sidebar = () => {
 
       {/* Community Images */}
       <div
-        onClick={() => navigate("/credits")}
+        onClick={() => {
+          navigate("/community");
+          setIsMenuOpen(false);
+        }}
         className="flex items-center gap-2 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer hover:scale-105 transition-all text-gray-800 dark:text-gray-100"
       >
         <img src={assets.gallery_icon} className="w-4.5 not-dark:invert" alt="" />
@@ -112,7 +118,10 @@ const Sidebar = () => {
 
       {/* Credits */}
       <div
-        onClick={() => navigate("/credits")}
+        onClick={() => {
+          navigate("/credits");
+          setIsMenuOpen(false);
+        }}
         className="flex items-center gap-2 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer hover:scale-105 transition-all"
       >
         <img src={assets.diamond_icon} className="w-4.5 dark:invert" alt="" />
@@ -142,23 +151,32 @@ const Sidebar = () => {
               setTheme(theme === "dark" ? "light" : "dark")
             }
           />
-
           <div className="w-10 h-5 bg-gray-300 rounded-full peer-checked:bg-purple-600 transition-colors"></div>
           <span className="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-5"></span>
         </label>
       </div>
-      {/*user account */}
-      <div
-        className="flex items-center gap-3 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer group"
-      >
+
+      {/* User Account */}
+      <div className="flex items-center gap-3 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer group">
         <img src={assets.user_icon} className="w-7 rounded-full" alt="" />
-        <p className="flex-1 text-sm dark:text-primary truncate">{user?user.name:'Login your account'}</p>
-        {user&&<img src={assets.logout_icon} className="h-5 cursor-pointer hidden not-dark:invert group-hover:block"/>}
-
+        <p className="flex-1 text-sm dark:text-primary truncate">
+          {user ? user.name : "Login your account"}
+        </p>
+        {user && (
+          <img
+            src={assets.logout_icon}
+            className="h-5 cursor-pointer hidden not-dark:invert group-hover:block"
+            alt=""
+          />
+        )}
       </div>
-      <img src={assets.close_icon} className=" absolute top-3 right-3 w-5 h-5 cursor-pointer md:hidden not-dark:invert" alt=""/>
 
-
+      <img
+        onClick={() => setIsMenuOpen(false)}
+        src={assets.close_icon}
+        className="absolute top-3 right-3 w-5 h-5 cursor-pointer md:hidden not-dark:invert"
+        alt=""
+      />
     </div>
   );
 };
