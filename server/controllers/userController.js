@@ -59,3 +59,31 @@ export const getUser=async(req,res)=>{
 
     }
 }
+//API TO GET PUBLISHED IMAGES
+export const getPublishedImages=async(req,res)=>{
+    try{
+        const publishedImageMessages=await CharacterData.aggregate([
+            {$unwind:"$messages"},
+            {
+                $match:{
+                    "messages.isImage":true,
+                    "messages.isPublished":true
+                }
+            },
+            {
+                $project:{
+                    _id:0,
+                    imageUrl:"$messages.content",
+                    username:"$username"
+                }
+            }
+        ])
+        res.json({success:true,images:publishedImageMessages.reverse()})
+
+    }catch(error){
+       return  res.json({success:false,message:error.message});
+       
+
+    }
+    
+}
