@@ -1,14 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { dummyPlans } from "../assets/assets";
 import Loading from "./Loading";
+import { useAppContext } from "../context/AppContext";
 
 const Credits = () => {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const{axios,token}=useAppContext();
+  const fetchPlans=async()=>{
+    try {
+      const{data}=await axios.get('/api/credit/plan',{
+      headers:{Authorization:token}  
+      })
+      if(data.success){
+        setPlans(data.plans)
+      }else{
+        toast.error(data.message||'failedto fetch plans')
+      }
+      
+    } catch (error) {
+      toast.error(error.message)
+      
+    }
+    setLoading(false)
+
+  }
+  const purchasePlan=async(planId)=>{
+    try {
+      const{data}=await axios.post('/api/credit/purchase',{planId},{headers:{Authorization:token}});
+      if(data.success){
+        window.location.href=data.url;
+      }else{
+        toast.error(data.message)
+      }
+      
+    } catch (error) {
+      toast.error(error.message);
+      
+    }
+  }
 
   useEffect(() => {
-    setPlans(dummyPlans);
-    setLoading(false);
+    fetchPlans()
+   
   }, []);
 
   if (loading) return <Loading />;
@@ -62,7 +96,7 @@ const Credits = () => {
               </ul>
 
               {/* Add Now Button */}
-              <button
+              <button onClick={()=>toast.promise(purchasePlan(plan._id),{loading:'processing...'})}
                 className="
                   mt-auto w-full py-2 rounded-lg font-semibold
                   bg-purple-600 text-white
