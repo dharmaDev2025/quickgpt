@@ -31,16 +31,18 @@ const ChatBox = () => {
     setLoading(true);
 
     try {
-      // ✅ Use full backend URL from .env
+      // ✅ FIXED: Use full backend URL from .env
       const { data } = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/api/message/${mode}`,
-        { chatId: selectedChat._id, prompt: promptCopy, isPublished },
+        `/api/message/${mode}`, { chatId: selectedChat._id, prompt: promptCopy, isPublished },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (data.success && data.reply) {
         setMessages(prev => [...prev, data.reply]);
-        setSelectedChat(prev => ({ ...prev, messages: [...(prev.messages || []), userMessage, data.reply] }));
+        setSelectedChat(prev => ({
+          ...prev,
+          messages: [...(prev.messages || []), userMessage, data.reply]
+        }));
         setUser(prev => ({ ...prev, credits: prev.credits - cost }));
       } else {
         toast.error(data.message || 'No reply received from backend');
@@ -49,7 +51,7 @@ const ChatBox = () => {
       }
     } catch (error) {
       console.error('API Error:', error.response?.data || error.message);
-      toast.error(error.response?.data?.message || error.message || 'Network error');
+      toast.error(error.message || 'Network error');
       setMessages(prev => prev.slice(0, -1));
       setPrompt(promptCopy);
     } finally {
